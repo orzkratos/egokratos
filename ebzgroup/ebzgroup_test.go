@@ -1,4 +1,4 @@
-package erkbizgroup_test
+package ebzgroup_test
 
 import (
 	"context"
@@ -7,9 +7,9 @@ import (
 	"time"
 
 	"github.com/orzkratos/errkratos"
-	"github.com/orzkratos/errkratos/errbizkratos"
+	"github.com/orzkratos/errkratos/ebzkratos"
+	"github.com/orzkratos/synckratos/ebzgroup"
 	"github.com/orzkratos/synckratos/erkgroup"
-	"github.com/orzkratos/synckratos/erkgroup/erkbizgroup"
 	"github.com/orzkratos/synckratos/internal/errors_example"
 	"github.com/stretchr/testify/require"
 	"github.com/yyle88/zaplog"
@@ -31,12 +31,12 @@ func TestWithContext(t *testing.T) {
 }
 
 func TestWithContext_StepRun(t *testing.T) {
-	ego, ctx := erkbizgroup.WithContext(context.Background())
+	ego, ctx := ebzgroup.WithContext(context.Background())
 	ego.SetLimit(10)
 
 	for idx := 1; idx <= 50; idx++ {
 		num := idx
-		ego.Go(func() *errbizkratos.Ebz {
+		ego.Go(func() *ebzkratos.Ebz {
 			return stepRun(ctx, num)
 		})
 	}
@@ -44,15 +44,15 @@ func TestWithContext_StepRun(t *testing.T) {
 	require.NotNil(t, ego.Wait())
 }
 
-func stepRun(ctx context.Context, num int) *errbizkratos.Ebz {
+func stepRun(ctx context.Context, num int) *ebzkratos.Ebz {
 	if ctx.Err() != nil {
 		zaplog.LOG.Info("task no", zap.Int("num", num))
-		return errbizkratos.NewEbz(errors_example.ErrorWrongContext("error=%v", ctx.Err()))
+		return ebzkratos.NewEbz(errors_example.ErrorWrongContext("error=%v", ctx.Err()))
 	}
 	time.Sleep(time.Duration(rand.IntN(1000)) * time.Millisecond) // 模拟计算延迟
 	if num%10 == 3 {
 		zaplog.LOG.Info("task wa", zap.Int("num", num))
-		return errbizkratos.NewEbz(errors_example.ErrorServerDbError("task wa %d", num)) // 模拟某个任务失败
+		return ebzkratos.NewEbz(errors_example.ErrorServerDbError("task wa %d", num)) // 模拟某个任务失败
 	}
 	zaplog.LOG.Info("task ok", zap.Int("num", num))
 	return nil
