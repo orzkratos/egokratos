@@ -7,6 +7,7 @@ require (
 	github.com/orzkratos/errkratos v0.0.23
 	github.com/stretchr/testify v1.10.0
 	github.com/yyle88/erero v1.0.20
+	github.com/yyle88/must v0.0.23
 	github.com/yyle88/zaplog v0.0.22
 	go.uber.org/zap v1.27.0
 	golang.org/x/sync v0.11.0
