@@ -15,6 +15,12 @@ type Task[A any, R any] struct {
 	Erk *errkratos.Erk
 }
 
+type TaskBatch[A any, R any] struct {
+	Tasks []*Task[A, R]
+	Index int64
+	Glide bool // Glide 标志位，控制是否平滑继续，有的时候只要有一个子任务失败就算失败(set false)，而有时候它们是独立的(set true)
+}
+
 func NewTaskBatch[A any, R any](args []A) *TaskBatch[A, R] {
 	tasks := make([]*Task[A, R], 0, len(args))
 	for idx := 0; idx < len(args); idx++ {
@@ -27,12 +33,8 @@ func NewTaskBatch[A any, R any](args []A) *TaskBatch[A, R] {
 	return &TaskBatch[A, R]{
 		Tasks: tasks,
 		Index: 0,
+		Glide: false,
 	}
-}
-
-type TaskBatch[A any, R any] struct {
-	Tasks []*Task[A, R]
-	Index int64
 }
 
 func (t *TaskBatch[A, R]) GetRun(ctx context.Context, run func(ctx context.Context, arg A) (R, *errkratos.Erk)) func() *errkratos.Erk {
@@ -44,9 +46,16 @@ func (t *TaskBatch[A, R]) GetRun(ctx context.Context, run func(ctx context.Conte
 		res, erk := run(ctx, task.Arg) //这里面你也不要panic，假如有panic需要调用者自己恢复
 		if erk != nil {
 			task.Erk = erk
+			if t.Glide {
+				return nil //当出错时，假如是设置“平滑继续”标志，就不返回错误，这样外层的 ctx 就不会被 cancel 掉，这也符合设计的目的
+			}
 			return erk
 		}
 		task.Res = res
 		return nil
 	}
+}
+
+func (t *TaskBatch[A, R]) SetGlide(glide bool) {
+	t.Glide = glide
 }

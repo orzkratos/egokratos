@@ -94,3 +94,25 @@ func taskRun(ctx context.Context, arg uint64) (string, *errkratos.Erk) {
 	res := strconv.FormatUint(arg, 10)
 	return res, nil
 }
+
+func TestGroup_Go_SetGlide_TaskRun(t *testing.T) {
+	ego, ctx := erkgroup.WithContext(context.Background())
+	ego.SetLimit(10)
+
+	args := make([]uint64, 0, 50)
+	for num := uint64(0); num < 50; num++ {
+		args = append(args, num)
+	}
+
+	var taskBatch = erkgroup.NewTaskBatch[uint64, string](args)
+	taskBatch.SetGlide(true)
+	for idx := 0; idx < 50; idx++ {
+		ego.Go(taskBatch.GetRun(ctx, taskRun))
+	}
+	erkrequire.NoError(t, ego.Wait())
+
+	for idx, task := range taskBatch.Tasks {
+		t.Log("idx:", idx, "arg:", task.Arg, "res:", task.Res, "erk:", task.Erk)
+	}
+	require.Equal(t, int64(50), taskBatch.Index)
+}
