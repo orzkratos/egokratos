@@ -164,7 +164,7 @@ func TestGroup_Go_SetGlide_SetNewCtxErk_TaskRun(t *testing.T) {
 
 	taskBatch := erkgroup.NewTaskBatch[uint64, string](args)
 	taskBatch.SetGlide(true)
-	taskBatch.SetNewCtxErk(func(erx error) *errkratos.Erk {
+	taskBatch.SetWaCtx(func(erx error) *errkratos.Erk {
 		return errors_example.ErrorWrongContext("ctx wrong reason=%v", erx)
 	})
 	for idx := 0; idx < 50; idx++ {
