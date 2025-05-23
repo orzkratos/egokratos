@@ -150,7 +150,7 @@ func TestGroup_Go_SetGlide_TaskRun(t *testing.T) {
 	}
 }
 
-func TestGroup_Go_SetGlide_SetNewCtxErk_TaskRun(t *testing.T) {
+func TestGroup_Go_SetGlide_SetWaCtx_TaskRun(t *testing.T) {
 	ctx, cancelFunc := context.WithTimeout(context.Background(), time.Millisecond*20)
 	defer cancelFunc()
 

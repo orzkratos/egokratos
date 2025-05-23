@@ -1,4 +1,4 @@
-package erkgroup
+package erkgroup_test
 
 import (
 	"context"
@@ -7,13 +7,15 @@ import (
 
 	"github.com/orzkratos/errkratos"
 	"github.com/orzkratos/errkratos/erkrequire"
+	"github.com/orzkratos/synckratos/erkgroup"
 	"github.com/orzkratos/synckratos/internal/errors_example"
 	"github.com/stretchr/testify/require"
+	"github.com/yyle88/neatjson/neatjsons"
 )
 
 func TestTaskBatch_GetRun(t *testing.T) {
 	var args = []uint64{0, 1, 2, 3, 4, 5}
-	var taskBatch = NewTaskBatch[uint64, string](args)
+	var taskBatch = erkgroup.NewTaskBatch[uint64, string](args)
 	for idx, task := range taskBatch.Tasks {
 		require.Equal(t, idx, int(task.Arg))
 	}
@@ -33,11 +35,16 @@ func TestTaskBatch_GetRun(t *testing.T) {
 		require.Equal(t, strconv.Itoa(idx), task.Res)
 		erkrequire.NoError(t, task.Erk)
 	}
+	results := taskBatch.Tasks.Flatten(func(arg uint64, erk *errkratos.Erk) string {
+		return "wa-" + strconv.Itoa(int(arg))
+	})
+	t.Log(neatjsons.S(results))
+	require.Equal(t, []string{"0", "1", "2", "3", "4", "5"}, results)
 }
 
 func TestTaskBatch_SetGlide_GetRun(t *testing.T) {
 	var args = []uint64{0, 1, 2, 3, 4, 5}
-	taskBatch := NewTaskBatch[uint64, string](args)
+	taskBatch := erkgroup.NewTaskBatch[uint64, string](args)
 	for idx, task := range taskBatch.Tasks {
 		require.Equal(t, idx, int(task.Arg))
 	}
@@ -65,19 +72,24 @@ func TestTaskBatch_SetGlide_GetRun(t *testing.T) {
 			erkrequire.NoError(t, task.Erk)
 		}
 	}
+	results := taskBatch.Tasks.Flatten(func(arg uint64, erk *errkratos.Erk) string {
+		return "wa-" + strconv.Itoa(int(arg))
+	})
+	t.Log(neatjsons.S(results))
+	require.Equal(t, []string{"wa-0", "1", "wa-2", "3", "wa-4", "5"}, results)
 }
 
 func TestTaskBatch_EgoRun(t *testing.T) {
 	ctx := context.Background()
 
 	var args = []uint64{0, 1, 2, 3, 4, 5}
-	taskBatch := NewTaskBatch[uint64, string](args)
+	taskBatch := erkgroup.NewTaskBatch[uint64, string](args)
 	for idx, task := range taskBatch.Tasks {
 		require.Equal(t, idx, int(task.Arg))
 	}
 	taskBatch.SetGlide(true)
 
-	ego := NewGroup(ctx)
+	ego := erkgroup.NewGroup(ctx)
 	ego.SetLimit(3)
 	taskBatch.EgoRun(ego, func(ctx context.Context, arg uint64) (string, *errkratos.Erk) {
 		if arg%2 == 0 {
@@ -97,4 +109,9 @@ func TestTaskBatch_EgoRun(t *testing.T) {
 			erkrequire.NoError(t, task.Erk)
 		}
 	}
+	results := taskBatch.Tasks.Flatten(func(arg uint64, erk *errkratos.Erk) string {
+		return "wa-" + strconv.Itoa(int(arg))
+	})
+	t.Log(neatjsons.S(results))
+	require.Equal(t, []string{"wa-0", "1", "wa-2", "3", "wa-4", "5"}, results)
 }

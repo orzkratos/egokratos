@@ -17,7 +17,7 @@ import (
 func TestRun(t *testing.T) {
 	ctx := context.Background()
 	guests := example1.NewGuests(10)
-	taskResults := processGuests(guests, ctx)
+	taskResults := processGuests(ctx, guests)
 	//把结果展成平铺的，避免泛型套泛型的输出，这样有利于外部观察和使用
 	guestOrdersStates := taskResults.Flatten(func(guest *example1.Guest, erk *errkratos.Erk) *example1.GuestOrdersStates {
 		return &example1.GuestOrdersStates{
@@ -30,7 +30,7 @@ func TestRun(t *testing.T) {
 	t.Log(neatjsons.S(guestOrdersStates))
 }
 
-func processGuests(guests []*example1.Guest, ctx context.Context) erkgroup.Tasks[*example1.Guest, *example1.GuestOrdersStates] {
+func processGuests(ctx context.Context, guests []*example1.Guest) erkgroup.Tasks[*example1.Guest, *example1.GuestOrdersStates] {
 	taskBatch := erkgroup.NewTaskBatch[*example1.Guest, *example1.GuestOrdersStates](guests)
 	taskBatch.SetGlide(true)
 	taskBatch.SetWaCtx(func(erx error) *errkratos.Erk {

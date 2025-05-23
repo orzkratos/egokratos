@@ -68,6 +68,6 @@ func (t *TaskBatch[A, R]) SetGlide(glide bool) {
 	t.Glide = glide
 }
 
-func (t *TaskBatch[A, R]) SetWaCtx(newCtxErk func(erx error) *errkratos.Erk) {
-	t.waCtx = newCtxErk
+func (t *TaskBatch[A, R]) SetWaCtx(waCtx func(erx error) *errkratos.Erk) {
+	t.waCtx = waCtx
 }
