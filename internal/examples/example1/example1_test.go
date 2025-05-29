@@ -6,11 +6,12 @@ import (
 	"math/rand/v2"
 	"testing"
 
+	"github.com/orzkratos/egokratos"
+	"github.com/orzkratos/egokratos/erkgroup"
+	"github.com/orzkratos/egokratos/internal/errors_example"
+	"github.com/orzkratos/egokratos/internal/examples/example1"
 	"github.com/orzkratos/errkratos"
 	"github.com/orzkratos/errkratos/erkmust"
-	"github.com/orzkratos/synckratos/erkgroup"
-	"github.com/orzkratos/synckratos/erkgroup/internal/examples/example1"
-	"github.com/orzkratos/synckratos/internal/errors_example"
 	"github.com/yyle88/neatjson/neatjsons"
 )
 
@@ -30,8 +31,8 @@ func TestRun(t *testing.T) {
 	t.Log(neatjsons.S(guestOrdersStates))
 }
 
-func processGuests(ctx context.Context, guests []*example1.Guest) erkgroup.Tasks[*example1.Guest, *example1.GuestOrdersStates] {
-	taskBatch := erkgroup.NewTaskBatch[*example1.Guest, *example1.GuestOrdersStates](guests)
+func processGuests(ctx context.Context, guests []*example1.Guest) egokratos.Tasks[*example1.Guest, *example1.GuestOrdersStates] {
+	taskBatch := egokratos.NewTaskBatch[*example1.Guest, *example1.GuestOrdersStates](guests)
 	taskBatch.SetGlide(true)
 	taskBatch.SetWaCtx(func(erx error) *errkratos.Erk {
 		return errors_example.ErrorWrongContext("wrong-ctx-can-not-invoke-process-guest-func. error=%v", erx)
@@ -70,8 +71,8 @@ func processGuestFunc(ctx context.Context, guest *example1.Guest) (*example1.Gue
 	}, nil
 }
 
-func processOrders(ctx context.Context, orders []*example1.Order) erkgroup.Tasks[*example1.Order, *example1.OrderState] {
-	taskBatch := erkgroup.NewTaskBatch[*example1.Order, *example1.OrderState](orders)
+func processOrders(ctx context.Context, orders []*example1.Order) egokratos.Tasks[*example1.Order, *example1.OrderState] {
+	taskBatch := egokratos.NewTaskBatch[*example1.Order, *example1.OrderState](orders)
 	taskBatch.SetGlide(true)
 	taskBatch.SetWaCtx(func(erx error) *errkratos.Erk {
 		return errors_example.ErrorWrongContext("wrong-ctx-can-not-invoke-process-order-func. error=%v", erx)

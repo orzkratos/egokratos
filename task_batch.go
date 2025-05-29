@@ -1,10 +1,11 @@
-package erkgroup
+package egokratos
 
 import (
 	"context"
 
+	"github.com/orzkratos/egokratos/erkgroup"
+	"github.com/orzkratos/egokratos/internal/utils"
 	"github.com/orzkratos/errkratos"
-	"github.com/orzkratos/synckratos/internal/utils"
 	"github.com/yyle88/must"
 	"github.com/yyle88/must/mustnum"
 )
@@ -58,7 +59,7 @@ func (t *TaskBatch[A, R]) GetRun(idx int, run func(ctx context.Context, arg A) (
 }
 
 // EgoRun 既演示如何使用 GetRun，而且当任务逻辑较重而调用层逻辑较轻时，也可以直接反过来以调用层为参数，相当于传过来个调度器，调度执行函数
-func (t *TaskBatch[A, R]) EgoRun(ego *Group, run func(ctx context.Context, arg A) (R, *errkratos.Erk)) {
+func (t *TaskBatch[A, R]) EgoRun(ego *erkgroup.Group, run func(ctx context.Context, arg A) (R, *errkratos.Erk)) {
 	for idx := 0; idx < len(t.Tasks); idx++ {
 		ego.Go(t.GetRun(idx, run))
 	}

@@ -1,6 +1,9 @@
-package erkgroup
+package egokratos
 
-import "github.com/orzkratos/errkratos"
+import (
+	"github.com/orzkratos/egokratos/internal/utils"
+	"github.com/orzkratos/errkratos"
+)
 
 type TaskOutput[ARG any, RES any] struct {
 	Arg ARG
@@ -17,10 +20,9 @@ func NewOkTaskOutput[ARG any, RES any](arg ARG, res RES) *TaskOutput[ARG, RES] {
 }
 
 func NewWaTaskOutput[ARG any, RES any](arg ARG, erk *errkratos.Erk) *TaskOutput[ARG, RES] {
-	var res RES
 	return &TaskOutput[ARG, RES]{
 		Arg: arg,
-		Res: res,
+		Res: utils.Zero[RES](),
 		Erk: erk,
 	}
 }

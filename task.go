@@ -1,4 +1,4 @@
-package erkgroup
+package egokratos
 
 import "github.com/orzkratos/errkratos"
 

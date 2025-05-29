@@ -3,7 +3,6 @@ package erkgroup
 import (
 	"context"
 
-	"github.com/go-kratos/kratos/v2/errors"
 	"github.com/orzkratos/errkratos"
 	"golang.org/x/sync/errgroup"
 )
@@ -23,7 +22,7 @@ func NewGroup(ctx context.Context) *Group {
 
 func (G *Group) Wait() *errkratos.Erk {
 	if err := G.ego.Wait(); err != nil {
-		return errors.FromError(err)
+		return errkratos.FromError(err)
 	}
 	return nil
 }

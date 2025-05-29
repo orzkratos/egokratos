@@ -1,27 +1,27 @@
-package erkgroup_test
+package egokratos_test
 
 import (
 	"strconv"
 	"testing"
 
+	"github.com/orzkratos/egokratos"
+	"github.com/orzkratos/egokratos/internal/errors_example"
 	"github.com/orzkratos/errkratos"
-	"github.com/orzkratos/synckratos/erkgroup"
-	"github.com/orzkratos/synckratos/internal/errors_example"
 	"github.com/stretchr/testify/require"
 	"github.com/yyle88/neatjson/neatjsons"
 )
 
 func TestTasks_OkTasks(t *testing.T) {
-	var tasks = make(erkgroup.Tasks[uint64, string], 0, 10)
+	var tasks = make(egokratos.Tasks[uint64, string], 0, 10)
 	for idx := 0; idx < 10; idx++ {
 		if idx%2 == 0 {
-			tasks = append(tasks, &erkgroup.Task[uint64, string]{
+			tasks = append(tasks, &egokratos.Task[uint64, string]{
 				Arg: uint64(idx),
 				Res: strconv.Itoa(idx),
 				Erk: nil,
 			})
 		} else {
-			tasks = append(tasks, &erkgroup.Task[uint64, string]{
+			tasks = append(tasks, &egokratos.Task[uint64, string]{
 				Arg: uint64(idx),
 				Res: "",
 				Erk: errors_example.ErrorServerDbError("wrong-db"),

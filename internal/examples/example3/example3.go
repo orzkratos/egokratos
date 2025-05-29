@@ -1,14 +1,16 @@
 package example3
 
-import "github.com/orzkratos/synckratos/erkgroup"
+import (
+	"github.com/orzkratos/egokratos"
+)
 
 type Step1Param struct {
 	NumA int
 }
 
 type Step1Result struct {
-	StrA         string
-	Step2Outputs erkgroup.TaskOutputList[*Step2Param, *Step2Result]
+	ResA         string
+	Step2Outputs egokratos.TaskOutputList[*Step2Param, *Step2Result]
 }
 
 type Step2Param struct {
@@ -16,8 +18,8 @@ type Step2Param struct {
 }
 
 type Step2Result struct {
-	StrB         string
-	Step3Outputs erkgroup.TaskOutputList[*Step3Param, *Step3Result]
+	ResB         string
+	Step3Outputs egokratos.TaskOutputList[*Step3Param, *Step3Result]
 }
 
 type Step3Param struct {
@@ -25,7 +27,7 @@ type Step3Param struct {
 }
 
 type Step3Result struct {
-	StrC string
+	ResC string
 }
 
 func NewStep1Params(paramCount int) []*Step1Param {

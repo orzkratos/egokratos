@@ -1,14 +1,15 @@
-package erkgroup_test
+package egokratos_test
 
 import (
 	"context"
 	"strconv"
 	"testing"
 
+	"github.com/orzkratos/egokratos"
+	"github.com/orzkratos/egokratos/erkgroup"
+	"github.com/orzkratos/egokratos/internal/errors_example"
 	"github.com/orzkratos/errkratos"
 	"github.com/orzkratos/errkratos/erkmust"
-	"github.com/orzkratos/synckratos/erkgroup"
-	"github.com/orzkratos/synckratos/internal/errors_example"
 	"github.com/stretchr/testify/require"
 	"github.com/yyle88/neatjson/neatjsons"
 )
@@ -27,24 +28,24 @@ func TestTaskOutput(t *testing.T) {
 		args = append(args, &Param{Value: num})
 	}
 
-	taskBatch := erkgroup.NewTaskBatch[*Param, *erkgroup.TaskOutput[*Param, *Result]](args)
+	taskBatch := egokratos.NewTaskBatch[*Param, *egokratos.TaskOutput[*Param, *Result]](args)
 	taskBatch.SetGlide(true)
 	taskBatch.SetWaCtx(func(erx error) *errkratos.Erk {
 		return errors_example.ErrorWrongContext("wrong-ctx. error=%v", erx)
 	})
 	ego := erkgroup.NewGroup(context.Background())
 	ego.SetLimit(3)
-	taskBatch.EgoRun(ego, func(ctx context.Context, arg *Param) (*erkgroup.TaskOutput[*Param, *Result], *errkratos.Erk) {
+	taskBatch.EgoRun(ego, func(ctx context.Context, arg *Param) (*egokratos.TaskOutput[*Param, *Result], *errkratos.Erk) {
 		if arg.Value%3 == 2 {
 			return nil, errors_example.ErrorServerDbError("wrong-db")
 		}
 		res := &Result{Value: strconv.Itoa(arg.Value)}
-		return erkgroup.NewOkTaskOutput[*Param, *Result](arg, res), nil
+		return egokratos.NewOkTaskOutput[*Param, *Result](arg, res), nil
 	})
 	erkmust.Done(ego.Wait())
-	results := taskBatch.Tasks.Flatten(erkgroup.NewWaTaskOutput[*Param, *Result])
+	results := taskBatch.Tasks.Flatten(egokratos.NewWaTaskOutput[*Param, *Result])
 
-	ops := erkgroup.TaskOutputList[*Param, *Result](results)
+	ops := egokratos.TaskOutputList[*Param, *Result](results)
 	t.Log(neatjsons.S(ops))
 
 	require.Len(t, ops.OkList(), 4)

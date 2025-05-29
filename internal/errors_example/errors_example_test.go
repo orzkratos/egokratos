@@ -3,7 +3,7 @@ package errors_example_test
 import (
 	"testing"
 
-	"github.com/orzkratos/synckratos/internal/errors_example"
+	"github.com/orzkratos/egokratos/internal/errors_example"
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/require"
 )
