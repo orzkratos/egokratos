@@ -37,8 +37,7 @@ func (t *TaskBatch[A, R]) GetRun(idx int, run func(ctx context.Context, arg A) (
 	task := t.Tasks[idx]
 	return func(ctx context.Context) *errkratos.Erk {
 		if t.waCtx != nil && ctx.Err() != nil {
-			erk := t.waCtx(ctx.Err())
-			must.Full(erk) //这里避免被外部诓骗，你的错误函数不能返回假的
+			erk := must.Full(t.waCtx(ctx.Err())) //这里避免被外部诓骗，你的错误函数不能返回假的
 			task.Erk = erk
 			if t.Glide {
 				return nil //这个标志位是"平滑继续"的作用。即使 ctx 出错时后续也无法执行，但依然需要他们都走到这里，把错误设置到结果里
