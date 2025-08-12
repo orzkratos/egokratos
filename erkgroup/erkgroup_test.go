@@ -7,7 +7,7 @@ import (
 	"time"
 
 	"github.com/orzkratos/egokratos/erkgroup"
-	"github.com/orzkratos/egokratos/internal/errors_example"
+	"github.com/orzkratos/egokratos/internal/errorspb"
 	"github.com/orzkratos/errkratos"
 	"github.com/orzkratos/errkratos/erkrequire"
 	"github.com/stretchr/testify/require"
@@ -81,12 +81,12 @@ func TestNewGroup_StepRun(t *testing.T) {
 func stepRun(ctx context.Context, idx int) *errkratos.Erk {
 	if ctx.Err() != nil {
 		zaplog.LOG.Info("task no", zap.Int("num", idx))
-		return errors_example.ErrorWrongContext("error=%v", ctx.Err())
+		return errorspb.ErrorWrongContext("error=%v", ctx.Err())
 	}
 	time.Sleep(time.Duration(rand.IntN(1000)) * time.Millisecond) // 模拟计算延迟
 	if idx%10 == 3 {
 		zaplog.LOG.Info("task wa", zap.Int("num", idx))
-		return errors_example.ErrorServerDbError("task wa %d", idx) // 模拟某个任务失败
+		return errorspb.ErrorServerDbError("task wa %d", idx) // 模拟某个任务失败
 	}
 	zaplog.LOG.Info("task ok", zap.Int("num", idx))
 	return nil

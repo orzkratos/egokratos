@@ -8,7 +8,7 @@ import (
 
 	"github.com/orzkratos/egokratos"
 	"github.com/orzkratos/egokratos/erkgroup"
-	"github.com/orzkratos/egokratos/internal/errors_example"
+	"github.com/orzkratos/egokratos/internal/errorspb"
 	"github.com/orzkratos/egokratos/internal/examples/example1"
 	"github.com/orzkratos/errkratos"
 	"github.com/orzkratos/errkratos/erkmust"
@@ -35,7 +35,7 @@ func processGuests(ctx context.Context, guests []*example1.Guest) egokratos.Task
 	taskBatch := egokratos.NewTaskBatch[*example1.Guest, *example1.GuestOrdersStates](guests)
 	taskBatch.SetGlide(true)
 	taskBatch.SetWaCtx(func(erx error) *errkratos.Erk {
-		return errors_example.ErrorWrongContext("wrong-ctx-can-not-invoke-process-guest-func. error=%v", erx)
+		return errorspb.ErrorWrongContext("wrong-ctx-can-not-invoke-process-guest-func. error=%v", erx)
 	})
 	ego := erkgroup.NewGroup(ctx)
 	ego.SetLimit(3)
@@ -46,7 +46,7 @@ func processGuests(ctx context.Context, guests []*example1.Guest) egokratos.Task
 
 func processGuestFunc(ctx context.Context, guest *example1.Guest) (*example1.GuestOrdersStates, *errkratos.Erk) {
 	if rand.IntN(2) == 0 {
-		return nil, errors_example.ErrorServerDbError("wrong-db")
+		return nil, errorspb.ErrorServerDbError("wrong-db")
 	}
 	orderCount := 1 + rand.IntN(5)
 	orders := example1.NewOrders(guest, orderCount)
@@ -75,7 +75,7 @@ func processOrders(ctx context.Context, orders []*example1.Order) egokratos.Task
 	taskBatch := egokratos.NewTaskBatch[*example1.Order, *example1.OrderState](orders)
 	taskBatch.SetGlide(true)
 	taskBatch.SetWaCtx(func(erx error) *errkratos.Erk {
-		return errors_example.ErrorWrongContext("wrong-ctx-can-not-invoke-process-order-func. error=%v", erx)
+		return errorspb.ErrorWrongContext("wrong-ctx-can-not-invoke-process-order-func. error=%v", erx)
 	})
 	ego := erkgroup.NewGroup(ctx)
 	ego.SetLimit(2)
@@ -86,7 +86,7 @@ func processOrders(ctx context.Context, orders []*example1.Order) egokratos.Task
 
 func processOrderFunc(ctx context.Context, order *example1.Order) (*example1.OrderState, *errkratos.Erk) {
 	if rand.IntN(2) == 0 {
-		return nil, errors_example.ErrorServerDbError("wrong-db")
+		return nil, errorspb.ErrorServerDbError("wrong-db")
 	}
 	return &example1.OrderState{
 		Order: order,

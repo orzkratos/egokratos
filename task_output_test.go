@@ -7,7 +7,7 @@ import (
 
 	"github.com/orzkratos/egokratos"
 	"github.com/orzkratos/egokratos/erkgroup"
-	"github.com/orzkratos/egokratos/internal/errors_example"
+	"github.com/orzkratos/egokratos/internal/errorspb"
 	"github.com/orzkratos/errkratos"
 	"github.com/orzkratos/errkratos/erkmust"
 	"github.com/stretchr/testify/require"
@@ -31,13 +31,13 @@ func TestTaskOutput(t *testing.T) {
 	taskBatch := egokratos.NewTaskBatch[*Param, *egokratos.TaskOutput[*Param, *Result]](args)
 	taskBatch.SetGlide(true)
 	taskBatch.SetWaCtx(func(erx error) *errkratos.Erk {
-		return errors_example.ErrorWrongContext("wrong-ctx. error=%v", erx)
+		return errorspb.ErrorWrongContext("wrong-ctx. error=%v", erx)
 	})
 	ego := erkgroup.NewGroup(context.Background())
 	ego.SetLimit(3)
 	taskBatch.EgoRun(ego, func(ctx context.Context, arg *Param) (*egokratos.TaskOutput[*Param, *Result], *errkratos.Erk) {
 		if arg.Value%3 == 2 {
-			return nil, errors_example.ErrorServerDbError("wrong-db")
+			return nil, errorspb.ErrorServerDbError("wrong-db")
 		}
 		res := &Result{Value: strconv.Itoa(arg.Value)}
 		return egokratos.NewOkTaskOutput[*Param, *Result](arg, res), nil

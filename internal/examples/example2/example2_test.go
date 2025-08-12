@@ -7,7 +7,7 @@ import (
 
 	"github.com/orzkratos/egokratos"
 	"github.com/orzkratos/egokratos/erkgroup"
-	"github.com/orzkratos/egokratos/internal/errors_example"
+	"github.com/orzkratos/egokratos/internal/errorspb"
 	"github.com/orzkratos/egokratos/internal/examples/example2"
 	"github.com/orzkratos/errkratos"
 	"github.com/orzkratos/errkratos/erkmust"
@@ -32,7 +32,7 @@ func processClasses(ctx context.Context, classes []*example2.Class) egokratos.Ta
 	taskBatch := egokratos.NewTaskBatch[*example2.Class, *example2.ClassStudentsScores](classes)
 	taskBatch.SetGlide(true)
 	taskBatch.SetWaCtx(func(erx error) *errkratos.Erk {
-		return errors_example.ErrorWrongContext("wrong-ctx-can-not-invoke-process-class-func. error=%v", erx)
+		return errorspb.ErrorWrongContext("wrong-ctx-can-not-invoke-process-class-func. error=%v", erx)
 	})
 	ego := erkgroup.NewGroup(ctx)
 	ego.SetLimit(3)
@@ -43,7 +43,7 @@ func processClasses(ctx context.Context, classes []*example2.Class) egokratos.Ta
 
 func processClassFunc(ctx context.Context, arg *example2.Class) (*example2.ClassStudentsScores, *errkratos.Erk) {
 	if rand.IntN(100) < 30 {
-		return nil, errors_example.ErrorServerDbError("wrong-db")
+		return nil, errorspb.ErrorServerDbError("wrong-db")
 	}
 	studentCount := 1 + rand.IntN(5)
 	students := example2.NewStudents(studentCount)
@@ -83,7 +83,7 @@ func processStudents(ctx context.Context, students []*example2.Student) egokrato
 	taskBatch := egokratos.NewTaskBatch[*example2.Student, *example2.StudentScores](students)
 	taskBatch.SetGlide(true)
 	taskBatch.SetWaCtx(func(erx error) *errkratos.Erk {
-		return errors_example.ErrorWrongContext("wrong-ctx-can-not-invoke-process-student-func. error=%v", erx)
+		return errorspb.ErrorWrongContext("wrong-ctx-can-not-invoke-process-student-func. error=%v", erx)
 	})
 	ego := erkgroup.NewGroup(ctx)
 	ego.SetLimit(2)
@@ -94,7 +94,7 @@ func processStudents(ctx context.Context, students []*example2.Student) egokrato
 
 func processStudentFunc(ctx context.Context, arg *example2.Student) (*example2.StudentScores, *errkratos.Erk) {
 	if rand.IntN(100) < 30 {
-		return nil, errors_example.ErrorServerDbError("wrong-db")
+		return nil, errorspb.ErrorServerDbError("wrong-db")
 	}
 	subjectCount := 1 + rand.IntN(2)
 	subjects := example2.NewSubjects(subjectCount)
@@ -134,7 +134,7 @@ func processSubjects(ctx context.Context, subjects []*example2.Subject) egokrato
 	taskBatch := egokratos.NewTaskBatch[*example2.Subject, *example2.SubjectScore](subjects)
 	taskBatch.SetGlide(true)
 	taskBatch.SetWaCtx(func(erx error) *errkratos.Erk {
-		return errors_example.ErrorWrongContext("wrong-ctx-can-not-invoke-process-subject-func. error=%v", erx)
+		return errorspb.ErrorWrongContext("wrong-ctx-can-not-invoke-process-subject-func. error=%v", erx)
 	})
 	ego := erkgroup.NewGroup(ctx)
 	ego.SetLimit(2)
@@ -145,7 +145,7 @@ func processSubjects(ctx context.Context, subjects []*example2.Subject) egokrato
 
 func processSubjectFunc(ctx context.Context, arg *example2.Subject) (*example2.SubjectScore, *errkratos.Erk) {
 	if rand.IntN(100) < 30 {
-		return nil, errors_example.ErrorServerDbError("wrong-db")
+		return nil, errorspb.ErrorServerDbError("wrong-db")
 	}
 	return &example2.SubjectScore{
 		Subject: arg,

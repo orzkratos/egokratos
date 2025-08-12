@@ -8,7 +8,7 @@ import (
 
 	"github.com/orzkratos/egokratos"
 	"github.com/orzkratos/egokratos/erkgroup"
-	"github.com/orzkratos/egokratos/internal/errors_example"
+	"github.com/orzkratos/egokratos/internal/errorspb"
 	"github.com/orzkratos/egokratos/internal/examples/example3"
 	"github.com/orzkratos/errkratos"
 	"github.com/orzkratos/errkratos/erkmust"
@@ -42,7 +42,7 @@ func processStep1s(t *testing.T, params []*example3.Step1Param, zapLog *zaplog.Z
 	taskBatch := egokratos.NewTaskBatch[*example3.Step1Param, *Step1Output](params)
 	taskBatch.SetGlide(true)
 	taskBatch.SetWaCtx(func(erx error) *errkratos.Erk {
-		return errors_example.ErrorWrongContext("wrong-ctx. error=%v", erx)
+		return errorspb.ErrorWrongContext("wrong-ctx. error=%v", erx)
 	})
 	ego := erkgroup.NewGroup(context.Background())
 	ego.SetLimit(3)
@@ -58,7 +58,7 @@ func processStep1s(t *testing.T, params []*example3.Step1Param, zapLog *zaplog.Z
 func processStep1Func(t *testing.T, ctx context.Context, arg *example3.Step1Param, zapLog *zaplog.Zap) (*Step1Output, *errkratos.Erk) {
 	if arg.NumA%2 == 1 {
 		zapLog.SUG.Debugln("wrong-a")
-		return nil, errors_example.ErrorServerDbError("step-1-wrong-db")
+		return nil, errorspb.ErrorServerDbError("step-1-wrong-db")
 	}
 	zapLog.SUG.Debugln("process")
 	res := &example3.Step1Result{
@@ -72,7 +72,7 @@ func processStep2s(t *testing.T, params []*example3.Step2Param, zapLog *zaplog.Z
 	taskBatch := egokratos.NewTaskBatch[*example3.Step2Param, *Step2Output](params)
 	taskBatch.SetGlide(true)
 	taskBatch.SetWaCtx(func(erx error) *errkratos.Erk {
-		return errors_example.ErrorWrongContext("wrong-ctx. error=%v", erx)
+		return errorspb.ErrorWrongContext("wrong-ctx. error=%v", erx)
 	})
 	ego := erkgroup.NewGroup(context.Background())
 	ego.SetLimit(3)
@@ -88,7 +88,7 @@ func processStep2s(t *testing.T, params []*example3.Step2Param, zapLog *zaplog.Z
 func processStep2Func(t *testing.T, ctx context.Context, arg *example3.Step2Param, zapLog *zaplog.Zap) (*Step2Output, *errkratos.Erk) {
 	if rand.IntN(100) < 30 {
 		zapLog.SUG.Debugln("wrong-b")
-		return nil, errors_example.ErrorServerDbError("step-2-wrong-db")
+		return nil, errorspb.ErrorServerDbError("step-2-wrong-db")
 	}
 	zapLog.SUG.Debugln("process")
 	res := &example3.Step2Result{
@@ -102,7 +102,7 @@ func processStep3s(t *testing.T, params []*example3.Step3Param, zapLog *zaplog.Z
 	taskBatch := egokratos.NewTaskBatch[*example3.Step3Param, *Step3Output](params)
 	taskBatch.SetGlide(true)
 	taskBatch.SetWaCtx(func(erx error) *errkratos.Erk {
-		return errors_example.ErrorWrongContext("wrong-ctx. error=%v", erx)
+		return errorspb.ErrorWrongContext("wrong-ctx. error=%v", erx)
 	})
 	ego := erkgroup.NewGroup(context.Background())
 	ego.SetLimit(3)
@@ -118,7 +118,7 @@ func processStep3s(t *testing.T, params []*example3.Step3Param, zapLog *zaplog.Z
 func processStep3Func(t *testing.T, ctx context.Context, arg *example3.Step3Param, zapLog *zaplog.Zap) (*Step3Output, *errkratos.Erk) {
 	if rand.IntN(100) < 50 {
 		zapLog.SUG.Debugln("wrong-c")
-		return nil, errors_example.ErrorServerDbError("step-3-wrong-db")
+		return nil, errorspb.ErrorServerDbError("step-3-wrong-db")
 	}
 	zapLog.SUG.Debugln("process")
 	res := &example3.Step3Result{

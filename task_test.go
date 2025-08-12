@@ -5,7 +5,7 @@ import (
 	"testing"
 
 	"github.com/orzkratos/egokratos"
-	"github.com/orzkratos/egokratos/internal/errors_example"
+	"github.com/orzkratos/egokratos/internal/errorspb"
 	"github.com/orzkratos/errkratos"
 	"github.com/stretchr/testify/require"
 	"github.com/yyle88/neatjson/neatjsons"
@@ -24,7 +24,7 @@ func TestTasks_OkTasks(t *testing.T) {
 			tasks = append(tasks, &egokratos.Task[uint64, string]{
 				Arg: uint64(idx),
 				Res: "",
-				Erk: errors_example.ErrorServerDbError("wrong-db"),
+				Erk: errorspb.ErrorServerDbError("wrong-db"),
 			})
 		}
 	}

@@ -9,7 +9,7 @@ import (
 
 	"github.com/orzkratos/egokratos"
 	"github.com/orzkratos/egokratos/erkgroup"
-	"github.com/orzkratos/egokratos/internal/errors_example"
+	"github.com/orzkratos/egokratos/internal/errorspb"
 	"github.com/orzkratos/errkratos"
 	"github.com/orzkratos/errkratos/erkrequire"
 	"github.com/stretchr/testify/require"
@@ -41,12 +41,12 @@ func TestGroup_Go_TaskRun(t *testing.T) {
 func taskRun(ctx context.Context, arg uint64) (string, *errkratos.Erk) {
 	if ctx.Err() != nil {
 		zaplog.LOG.Info("task no", zap.Uint64("arg", arg))
-		return "", errors_example.ErrorWrongContext("error=%v", ctx.Err())
+		return "", errorspb.ErrorWrongContext("error=%v", ctx.Err())
 	}
 	time.Sleep(time.Duration(rand.IntN(1000)) * time.Millisecond) // 模拟计算延迟
 	if arg%10 == 3 {
 		zaplog.LOG.Info("task wa", zap.Uint64("arg", arg))
-		return "", errors_example.ErrorServerDbError("task wa %d", arg) // 模拟某个任务失败
+		return "", errorspb.ErrorServerDbError("task wa %d", arg) // 模拟某个任务失败
 	}
 	zaplog.LOG.Info("task ok", zap.Uint64("arg", arg))
 
@@ -90,7 +90,7 @@ func TestGroup_Go_SetGlide_SetWaCtx_TaskRun(t *testing.T) {
 	taskBatch := egokratos.NewTaskBatch[uint64, string](args)
 	taskBatch.SetGlide(true)
 	taskBatch.SetWaCtx(func(erx error) *errkratos.Erk {
-		return errors_example.ErrorWrongContext("ctx wrong reason=%v", erx)
+		return errorspb.ErrorWrongContext("ctx wrong reason=%v", erx)
 	})
 	for idx := 0; idx < 50; idx++ {
 		ego.Go(taskBatch.GetRun(idx, func(ctx context.Context, arg uint64) (string, *errkratos.Erk) {
@@ -147,7 +147,7 @@ func TestTaskBatch_SetGlide_GetRun(t *testing.T) {
 	for idx := 0; idx < len(args); idx++ {
 		run := taskBatch.GetRun(idx, func(ctx context.Context, arg uint64) (string, *errkratos.Erk) {
 			if arg%2 == 0 {
-				return "", errors_example.ErrorServerDbError("wrong db")
+				return "", errorspb.ErrorServerDbError("wrong db")
 			}
 			res := strconv.FormatUint(arg, 10)
 			return res, nil
@@ -159,7 +159,7 @@ func TestTaskBatch_SetGlide_GetRun(t *testing.T) {
 	for idx, task := range taskBatch.Tasks {
 		t.Log("idx:", idx, "arg:", task.Arg, "res:", task.Res, "erk:", task.Erk)
 		if idx%2 == 0 {
-			require.True(t, errors_example.IsServerDbError(task.Erk))
+			require.True(t, errorspb.IsServerDbError(task.Erk))
 		} else {
 			require.Equal(t, strconv.Itoa(idx), task.Res)
 			erkrequire.NoError(t, task.Erk)
@@ -186,7 +186,7 @@ func TestTaskBatch_EgoRun(t *testing.T) {
 	ego.SetLimit(3)
 	taskBatch.EgoRun(ego, func(ctx context.Context, arg uint64) (string, *errkratos.Erk) {
 		if arg%2 == 0 {
-			return "", errors_example.ErrorServerDbError("wrong db")
+			return "", errorspb.ErrorServerDbError("wrong db")
 		}
 		res := strconv.FormatUint(arg, 10)
 		return res, nil
@@ -196,7 +196,7 @@ func TestTaskBatch_EgoRun(t *testing.T) {
 	for idx, task := range taskBatch.Tasks {
 		t.Log("idx:", idx, "arg:", task.Arg, "res:", task.Res, "erk:", task.Erk)
 		if idx%2 == 0 {
-			require.True(t, errors_example.IsServerDbError(task.Erk))
+			require.True(t, errorspb.IsServerDbError(task.Erk))
 		} else {
 			require.Equal(t, strconv.Itoa(idx), task.Res)
 			erkrequire.NoError(t, task.Erk)
