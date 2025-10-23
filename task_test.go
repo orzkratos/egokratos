@@ -11,6 +11,11 @@ import (
 	"github.com/yyle88/neatjson/neatjsons"
 )
 
+// TestTasks_OkTasks tests task filtering and result transformation
+// Validates OkTasks filtering, WaTasks filtering, and Flatten transformation
+//
+// TestTasks_OkTasks 测试任务过滤和结果转换
+// 验证 OkTasks 过滤、WaTasks 过滤和 Flatten 转换
 func TestTasks_OkTasks(t *testing.T) {
 	var tasks = make(egokratos.Tasks[uint64, string], 0, 10)
 	for idx := 0; idx < 10; idx++ {
@@ -18,13 +23,13 @@ func TestTasks_OkTasks(t *testing.T) {
 			tasks = append(tasks, &egokratos.Task[uint64, string]{
 				Arg: uint64(idx),
 				Res: strconv.Itoa(idx),
-				Erk: nil,
+				Erx: nil,
 			})
 		} else {
 			tasks = append(tasks, &egokratos.Task[uint64, string]{
 				Arg: uint64(idx),
 				Res: "",
-				Erk: errorspb.ErrorServerDbError("wrong-db"),
+				Erx: errorspb.ErrorServerDbError("wrong-db"),
 			})
 		}
 	}

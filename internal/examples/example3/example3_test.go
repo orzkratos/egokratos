@@ -11,17 +11,24 @@ import (
 	"github.com/orzkratos/egokratos/internal/errorspb"
 	"github.com/orzkratos/egokratos/internal/examples/example3"
 	"github.com/orzkratos/errkratos"
-	"github.com/orzkratos/errkratos/erkmust"
+	"github.com/orzkratos/errkratos/must/erkmust"
 	"github.com/stretchr/testify/require"
 	"github.com/yyle88/neatjson/neatjsons"
 	"github.com/yyle88/zaplog"
 	"go.uber.org/zap"
 )
 
+// Type aliases using TaskOutput to streamline multi-stage pipeline processing
+// 使用 TaskOutput 的类型别名，简化多阶段流水线处理
 type Step1Output = egokratos.TaskOutput[*example3.Step1Param, *example3.Step1Result]
 type Step2Output = egokratos.TaskOutput[*example3.Step2Param, *example3.Step2Result]
 type Step3Output = egokratos.TaskOutput[*example3.Step3Param, *example3.Step3Result]
 
+// TestTaskOutput demonstrates multi-stage pipeline processing with TaskOutput
+// Shows step1 -> step2 -> step3 processing with nested TaskOutputList at each stage
+//
+// TestTaskOutput 演示使用 TaskOutput 的多阶段流水线处理
+// 展示 step1 -> step2 -> step3 处理，每个阶段都有嵌套的 TaskOutputList
 func TestTaskOutput(t *testing.T) {
 	params := example3.NewStep1Params(5)
 
@@ -41,8 +48,8 @@ func TestTaskOutput(t *testing.T) {
 func processStep1s(t *testing.T, params []*example3.Step1Param, zapLog *zaplog.Zap) egokratos.TaskOutputList[*example3.Step1Param, *example3.Step1Result] {
 	taskBatch := egokratos.NewTaskBatch[*example3.Step1Param, *Step1Output](params)
 	taskBatch.SetGlide(true)
-	taskBatch.SetWaCtx(func(erx error) *errkratos.Erk {
-		return errorspb.ErrorWrongContext("wrong-ctx. error=%v", erx)
+	taskBatch.SetWaCtx(func(err error) *errkratos.Erk {
+		return errorspb.ErrorWrongContext("wrong-ctx. error=%v", err)
 	})
 	ego := erkgroup.NewGroup(context.Background())
 	ego.SetLimit(3)
@@ -71,8 +78,8 @@ func processStep1Func(t *testing.T, ctx context.Context, arg *example3.Step1Para
 func processStep2s(t *testing.T, params []*example3.Step2Param, zapLog *zaplog.Zap) egokratos.TaskOutputList[*example3.Step2Param, *example3.Step2Result] {
 	taskBatch := egokratos.NewTaskBatch[*example3.Step2Param, *Step2Output](params)
 	taskBatch.SetGlide(true)
-	taskBatch.SetWaCtx(func(erx error) *errkratos.Erk {
-		return errorspb.ErrorWrongContext("wrong-ctx. error=%v", erx)
+	taskBatch.SetWaCtx(func(err error) *errkratos.Erk {
+		return errorspb.ErrorWrongContext("wrong-ctx. error=%v", err)
 	})
 	ego := erkgroup.NewGroup(context.Background())
 	ego.SetLimit(3)
@@ -101,8 +108,8 @@ func processStep2Func(t *testing.T, ctx context.Context, arg *example3.Step2Para
 func processStep3s(t *testing.T, params []*example3.Step3Param, zapLog *zaplog.Zap) egokratos.TaskOutputList[*example3.Step3Param, *example3.Step3Result] {
 	taskBatch := egokratos.NewTaskBatch[*example3.Step3Param, *Step3Output](params)
 	taskBatch.SetGlide(true)
-	taskBatch.SetWaCtx(func(erx error) *errkratos.Erk {
-		return errorspb.ErrorWrongContext("wrong-ctx. error=%v", erx)
+	taskBatch.SetWaCtx(func(err error) *errkratos.Erk {
+		return errorspb.ErrorWrongContext("wrong-ctx. error=%v", err)
 	})
 	ego := erkgroup.NewGroup(context.Background())
 	ego.SetLimit(3)

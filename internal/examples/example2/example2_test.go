@@ -10,10 +10,15 @@ import (
 	"github.com/orzkratos/egokratos/internal/errorspb"
 	"github.com/orzkratos/egokratos/internal/examples/example2"
 	"github.com/orzkratos/errkratos"
-	"github.com/orzkratos/errkratos/erkmust"
+	"github.com/orzkratos/errkratos/must/erkmust"
 	"github.com/yyle88/neatjson/neatjsons"
 )
 
+// TestRun demonstrates three-stage nested batch processing: classes -> students -> subjects
+// Shows multi-stage task processing with score aggregation at each stage
+//
+// TestRun 演示三阶段嵌套批量处理：班级 -> 学生 -> 科目
+// 展示多阶段任务处理，每个阶段都有分数聚合
 func TestRun(t *testing.T) {
 	ctx := context.Background()
 	classes := example2.NewClasses(5)
@@ -31,8 +36,8 @@ func TestRun(t *testing.T) {
 func processClasses(ctx context.Context, classes []*example2.Class) egokratos.Tasks[*example2.Class, *example2.ClassStudentsScores] {
 	taskBatch := egokratos.NewTaskBatch[*example2.Class, *example2.ClassStudentsScores](classes)
 	taskBatch.SetGlide(true)
-	taskBatch.SetWaCtx(func(erx error) *errkratos.Erk {
-		return errorspb.ErrorWrongContext("wrong-ctx-can-not-invoke-process-class-func. error=%v", erx)
+	taskBatch.SetWaCtx(func(err error) *errkratos.Erk {
+		return errorspb.ErrorWrongContext("wrong-ctx-can-not-invoke-process-class-func. error=%v", err)
 	})
 	ego := erkgroup.NewGroup(ctx)
 	ego.SetLimit(3)
@@ -82,8 +87,8 @@ func processClassFunc(ctx context.Context, arg *example2.Class) (*example2.Class
 func processStudents(ctx context.Context, students []*example2.Student) egokratos.Tasks[*example2.Student, *example2.StudentScores] {
 	taskBatch := egokratos.NewTaskBatch[*example2.Student, *example2.StudentScores](students)
 	taskBatch.SetGlide(true)
-	taskBatch.SetWaCtx(func(erx error) *errkratos.Erk {
-		return errorspb.ErrorWrongContext("wrong-ctx-can-not-invoke-process-student-func. error=%v", erx)
+	taskBatch.SetWaCtx(func(err error) *errkratos.Erk {
+		return errorspb.ErrorWrongContext("wrong-ctx-can-not-invoke-process-student-func. error=%v", err)
 	})
 	ego := erkgroup.NewGroup(ctx)
 	ego.SetLimit(2)
@@ -133,8 +138,8 @@ func processStudentFunc(ctx context.Context, arg *example2.Student) (*example2.S
 func processSubjects(ctx context.Context, subjects []*example2.Subject) egokratos.Tasks[*example2.Subject, *example2.SubjectScore] {
 	taskBatch := egokratos.NewTaskBatch[*example2.Subject, *example2.SubjectScore](subjects)
 	taskBatch.SetGlide(true)
-	taskBatch.SetWaCtx(func(erx error) *errkratos.Erk {
-		return errorspb.ErrorWrongContext("wrong-ctx-can-not-invoke-process-subject-func. error=%v", erx)
+	taskBatch.SetWaCtx(func(err error) *errkratos.Erk {
+		return errorspb.ErrorWrongContext("wrong-ctx-can-not-invoke-process-subject-func. error=%v", err)
 	})
 	ego := erkgroup.NewGroup(ctx)
 	ego.SetLimit(2)

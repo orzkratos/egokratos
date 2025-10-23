@@ -11,7 +11,7 @@ import (
 	"github.com/orzkratos/egokratos/erkgroup"
 	"github.com/orzkratos/egokratos/internal/errorspb"
 	"github.com/orzkratos/errkratos"
-	"github.com/orzkratos/errkratos/erkrequire"
+	"github.com/orzkratos/errkratos/must/erkrequire"
 	"github.com/stretchr/testify/require"
 	"github.com/yyle88/neatjson/neatjsons"
 	"github.com/yyle88/zaplog"
@@ -34,7 +34,7 @@ func TestGroup_Go_TaskRun(t *testing.T) {
 	erkrequire.Error(t, ego.Wait())
 
 	for idx, task := range taskBatch.Tasks {
-		t.Log("idx:", idx, "arg:", task.Arg, "res:", task.Res, "erk:", task.Erk)
+		t.Log("idx:", idx, "arg:", task.Arg, "res:", task.Res, "erk:", task.Erx)
 	}
 }
 
@@ -43,10 +43,10 @@ func taskRun(ctx context.Context, arg uint64) (string, *errkratos.Erk) {
 		zaplog.LOG.Info("task no", zap.Uint64("arg", arg))
 		return "", errorspb.ErrorWrongContext("error=%v", ctx.Err())
 	}
-	time.Sleep(time.Duration(rand.IntN(1000)) * time.Millisecond) // 模拟计算延迟
+	time.Sleep(time.Duration(rand.IntN(1000)) * time.Millisecond) // Simulate computation time // 模拟计算延迟
 	if arg%10 == 3 {
 		zaplog.LOG.Info("task wa", zap.Uint64("arg", arg))
-		return "", errorspb.ErrorServerDbError("task wa %d", arg) // 模拟某个任务失败
+		return "", errorspb.ErrorServerDbError("task wa %d", arg) // Simulate task execution failure // 模拟某个任务失败
 	}
 	zaplog.LOG.Info("task ok", zap.Uint64("arg", arg))
 
@@ -54,6 +54,11 @@ func taskRun(ctx context.Context, arg uint64) (string, *errkratos.Erk) {
 	return res, nil
 }
 
+// TestGroup_Go_SetGlide_TaskRun tests glide mode with concurrent task execution
+// Validates that glide mode allows independent task execution without stopping on errors
+//
+// TestGroup_Go_SetGlide_TaskRun 测试平滑模式与并发任务执行
+// 验证平滑模式允许独立任务执行，不会因错误而停止
 func TestGroup_Go_SetGlide_TaskRun(t *testing.T) {
 	ego := erkgroup.NewGroup(context.Background())
 	ego.SetLimit(10)
@@ -71,7 +76,7 @@ func TestGroup_Go_SetGlide_TaskRun(t *testing.T) {
 	erkrequire.NoError(t, ego.Wait())
 
 	for idx, task := range taskBatch.Tasks {
-		t.Log("idx:", idx, "arg:", task.Arg, "res:", task.Res, "erk:", task.Erk)
+		t.Log("idx:", idx, "arg:", task.Arg, "res:", task.Res, "erk:", task.Erx)
 	}
 }
 
@@ -89,8 +94,8 @@ func TestGroup_Go_SetGlide_SetWaCtx_TaskRun(t *testing.T) {
 
 	taskBatch := egokratos.NewTaskBatch[uint64, string](args)
 	taskBatch.SetGlide(true)
-	taskBatch.SetWaCtx(func(erx error) *errkratos.Erk {
-		return errorspb.ErrorWrongContext("ctx wrong reason=%v", erx)
+	taskBatch.SetWaCtx(func(err error) *errkratos.Erk {
+		return errorspb.ErrorWrongContext("ctx wrong reason=%v", err)
 	})
 	for idx := 0; idx < 50; idx++ {
 		ego.Go(taskBatch.GetRun(idx, func(ctx context.Context, arg uint64) (string, *errkratos.Erk) {
@@ -102,7 +107,7 @@ func TestGroup_Go_SetGlide_SetWaCtx_TaskRun(t *testing.T) {
 	erkrequire.NoError(t, ego.Wait())
 
 	for idx, task := range taskBatch.Tasks {
-		t.Log("idx:", idx, "arg:", task.Arg, "res:", task.Res, "erk:", task.Erk)
+		t.Log("idx:", idx, "arg:", task.Arg, "res:", task.Res, "erk:", task.Erx)
 	}
 }
 
@@ -124,9 +129,9 @@ func TestTaskBatch_GetRun(t *testing.T) {
 		erkrequire.NoError(t, erk)
 	}
 	for idx, task := range taskBatch.Tasks {
-		t.Log("idx:", idx, "arg:", task.Arg, "res:", task.Res, "erk:", task.Erk)
+		t.Log("idx:", idx, "arg:", task.Arg, "res:", task.Res, "erk:", task.Erx)
 		require.Equal(t, strconv.Itoa(idx), task.Res)
-		erkrequire.NoError(t, task.Erk)
+		erkrequire.NoError(t, task.Erx)
 	}
 	results := taskBatch.Tasks.Flatten(func(arg uint64, erk *errkratos.Erk) string {
 		return "wa-" + strconv.Itoa(int(arg))
@@ -154,15 +159,15 @@ func TestTaskBatch_SetGlide_GetRun(t *testing.T) {
 		})
 		erk := run(ctx)
 		t.Log(erk)
-		erkrequire.NoError(t, erk) //当设置 "平滑继续" 时这里不返回错误
+		erkrequire.NoError(t, erk) // When "glide" mode is set, no error returned here // 当设置 "平滑继续" 时这里不返回错误
 	}
 	for idx, task := range taskBatch.Tasks {
-		t.Log("idx:", idx, "arg:", task.Arg, "res:", task.Res, "erk:", task.Erk)
+		t.Log("idx:", idx, "arg:", task.Arg, "res:", task.Res, "erk:", task.Erx)
 		if idx%2 == 0 {
-			require.True(t, errorspb.IsServerDbError(task.Erk))
+			require.True(t, errorspb.IsServerDbError(task.Erx))
 		} else {
 			require.Equal(t, strconv.Itoa(idx), task.Res)
-			erkrequire.NoError(t, task.Erk)
+			erkrequire.NoError(t, task.Erx)
 		}
 	}
 	results := taskBatch.Tasks.Flatten(func(arg uint64, erk *errkratos.Erk) string {
@@ -194,12 +199,12 @@ func TestTaskBatch_EgoRun(t *testing.T) {
 	erkrequire.NoError(t, ego.Wait())
 
 	for idx, task := range taskBatch.Tasks {
-		t.Log("idx:", idx, "arg:", task.Arg, "res:", task.Res, "erk:", task.Erk)
+		t.Log("idx:", idx, "arg:", task.Arg, "res:", task.Res, "erk:", task.Erx)
 		if idx%2 == 0 {
-			require.True(t, errorspb.IsServerDbError(task.Erk))
+			require.True(t, errorspb.IsServerDbError(task.Erx))
 		} else {
 			require.Equal(t, strconv.Itoa(idx), task.Res)
-			erkrequire.NoError(t, task.Erk)
+			erkrequire.NoError(t, task.Erx)
 		}
 	}
 	results := taskBatch.Tasks.Flatten(func(arg uint64, erk *errkratos.Erk) string {

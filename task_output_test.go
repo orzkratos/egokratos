@@ -9,11 +9,16 @@ import (
 	"github.com/orzkratos/egokratos/erkgroup"
 	"github.com/orzkratos/egokratos/internal/errorspb"
 	"github.com/orzkratos/errkratos"
-	"github.com/orzkratos/errkratos/erkmust"
+	"github.com/orzkratos/errkratos/must/erkmust"
 	"github.com/stretchr/testify/require"
 	"github.com/yyle88/neatjson/neatjsons"
 )
 
+// TestTaskOutput tests nested TaskOutput usage with batch processing
+// Validates TaskOutput creation, aggregation, and result filtering
+//
+// TestTaskOutput 测试嵌套 TaskOutput 使用与批量处理
+// 验证 TaskOutput 创建、聚合和结果过滤
 func TestTaskOutput(t *testing.T) {
 	type Param struct {
 		Value int
@@ -30,8 +35,8 @@ func TestTaskOutput(t *testing.T) {
 
 	taskBatch := egokratos.NewTaskBatch[*Param, *egokratos.TaskOutput[*Param, *Result]](args)
 	taskBatch.SetGlide(true)
-	taskBatch.SetWaCtx(func(erx error) *errkratos.Erk {
-		return errorspb.ErrorWrongContext("wrong-ctx. error=%v", erx)
+	taskBatch.SetWaCtx(func(err error) *errkratos.Erk {
+		return errorspb.ErrorWrongContext("wrong-ctx. error=%v", err)
 	})
 	ego := erkgroup.NewGroup(context.Background())
 	ego.SetLimit(3)

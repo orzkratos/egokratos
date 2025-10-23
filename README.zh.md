@@ -7,29 +7,29 @@
 
 # egokratos
 
-Type-safe batch task processing for Kratos with `*errkratos.Erk` error handling.
+为 Kratos 提供类型安全的批量任务处理，使用 `*errkratos.Erk` 错误处理。
 
-Built on [egobatch](https://github.com/yyle88/egobatch) generic foundation.
+基于 [egobatch](https://github.com/yyle88/egobatch) 泛型基础库构建。
 
 ---
 
-## Features
+## 特性
 
-🎯 **Kratos Integration**: Specialized with `*errkratos.Erk` error type
-⚡ **Batch Processing**: Concurrent task execution with type-safe errors
-🔄 **Flexible Modes**: Glide mode and fast-exit mode
-🌍 **Context Support**: Complete context propagation and timeout handling
-📋 **Result Filtering**: OkTasks/WaTasks methods in result aggregation
+🎯 **Kratos 集成**: 专门为 `*errkratos.Erk` 错误类型定制
+⚡ **批量处理**: 并发任务执行，类型安全的错误处理
+🔄 **灵活模式**: 平滑模式和快速失败模式
+🌍 **上下文支持**: 完整的上下文传播和超时处理
+📋 **结果过滤**: OkTasks/WaTasks 方法聚合结果
 
-## Installation
+## 安装
 
 ```bash
 go get github.com/orzkratos/egokratos
 ```
 
-## Quick Start
+## 快速开始
 
-### Basic errgroup with Kratos Errors
+### 基础 errgroup 使用 Kratos 错误
 
 ```go
 package main
@@ -47,39 +47,39 @@ func main() {
 	ctx := context.Background()
 	ego := erkgroup.NewGroup(ctx)
 
-	// Add task 1: takes 100ms to finish
+	// 添加任务 1：需要 100ms 完成
 	ego.Go(func(ctx context.Context) *errkratos.Erk {
 		time.Sleep(100 * time.Millisecond)
-		fmt.Println("Task 1 finished OK")
+		fmt.Println("任务 1 完成")
 		return nil
 	})
 
-	// Add task 2: takes 50ms to finish
+	// 添加任务 2：需要 50ms 完成
 	ego.Go(func(ctx context.Context) *errkratos.Erk {
 		time.Sleep(50 * time.Millisecond)
-		fmt.Println("Task 2 finished OK")
+		fmt.Println("任务 2 完成")
 		return nil
 	})
 
-	// Add task 3: takes 80ms to finish
+	// 添加任务 3：需要 80ms 完成
 	ego.Go(func(ctx context.Context) *errkratos.Erk {
 		time.Sleep(80 * time.Millisecond)
-		fmt.Println("Task 3 finished OK")
+		fmt.Println("任务 3 完成")
 		return nil
 	})
 
-	// Wait until tasks finish and get the first error
+	// 等待所有任务完成并获取第一个错误（如果存在）
 	if erk := ego.Wait(); erk != nil {
-		fmt.Printf("Got error: %s\n", erk.Error())
+		fmt.Printf("发生错误: %s\n", erk.Error())
 	} else {
-		fmt.Println("Tasks finished OK")
+		fmt.Println("任务完成")
 	}
 }
 ```
 
-⬆️ **Source:** [Source](internal/demos/demo1x/main.go)
+⬆️ **源码:** [源码](internal/demos/demo1x/main.go)
 
-### Batch Task Processing
+### 批量任务处理
 
 ```go
 package main
@@ -95,54 +95,54 @@ import (
 )
 
 func main() {
-	// Create batch with arguments
+	// 创建批量任务
 	args := []int{1, 2, 3, 4, 5}
 	batch := egokratos.NewTaskBatch[int, string](args)
 
-	// Configure glide mode - keep going even when errors happen
+	// 配置平滑模式 - 即使出现错误也继续处理
 	batch.SetGlide(true)
 
-	// Execute batch tasks
+	// 执行批量任务
 	ctx := context.Background()
 	ego := erkgroup.NewGroup(ctx)
 
 	batch.EgoRun(ego, func(ctx context.Context, num int) (string, *errors.Error) {
 		if num%2 == 0 {
-			// Even numbers finish OK
+			// 偶数处理完成
 			return fmt.Sprintf("even-%d", num), nil
 		}
-		// Odd numbers have errors
+		// 奇数出现错误
 		return "", errors.BadRequest("ODD_NUMBER", "odd number")
 	})
 
-	// In glide mode, ego.Wait() returns nil because errors are captured in tasks
+	// 在平滑模式下，ego.Wait() 返回 nil 因为错误已被捕获在任务中
 	erkmust.Done(ego.Wait())
 
-	// Get and handle task results
+	// 获取和处理任务结果
 	okTasks := batch.Tasks.OkTasks()
 	waTasks := batch.Tasks.WaTasks()
 
-	fmt.Printf("Success: %d, Failed: %d\n", len(okTasks), len(waTasks))
+	fmt.Printf("成功: %d, 失败: %d\n", len(okTasks), len(waTasks))
 
-	// Show OK results
+	// 显示成功结果
 	for _, task := range okTasks {
-		fmt.Printf("Arg: %d -> Result: %s\n", task.Arg, task.Res)
+		fmt.Printf("参数: %d -> 结果: %s\n", task.Arg, task.Res)
 	}
 
-	// Show failed results
+	// 显示失败结果
 	for _, task := range waTasks {
-		fmt.Printf("Arg: %d -> Error: %s\n", task.Arg, task.Erx.Error())
+		fmt.Printf("参数: %d -> 错误: %s\n", task.Arg, task.Erx.Error())
 	}
 }
 ```
 
-⬆️ **Source:** [Source](internal/demos/demo2x/main.go)
+⬆️ **源码:** [源码](internal/demos/demo2x/main.go)
 
-## Core Components
+## 核心组件
 
 ### erkgroup.Group
 
-Type-safe errgroup for Kratos:
+Kratos 的类型安全 errgroup：
 
 ```go
 type Group = erxgroup.Group[*errkratos.Erk]
@@ -152,7 +152,7 @@ func NewGroup(ctx context.Context) *Group
 
 ### TaskBatch[A, R]
 
-Batch task execution:
+批量任务执行：
 
 ```go
 type TaskBatch[A, R] = egobatch.TaskBatch[A, R, *errkratos.Erk]
@@ -160,53 +160,53 @@ type TaskBatch[A, R] = egobatch.TaskBatch[A, R, *errkratos.Erk]
 func NewTaskBatch[A, R](args []A) *TaskBatch[A, R]
 ```
 
-Methods:
-- `SetGlide(bool)` - Configure execution mode
-- `SetWaCtx(func(error) *errkratos.Erk)` - Handle context errors
-- `EgoRun(ego, func)` - Run batch with errgroup
+方法：
+- `SetGlide(bool)` - 配置执行模式
+- `SetWaCtx(func(error) *errkratos.Erk)` - 处理上下文错误
+- `EgoRun(ego, func)` - 使用 errgroup 运行批量任务
 
 ### Tasks[A, R]
 
-Task collection with filtering:
+任务集合，支持过滤：
 
 ```go
 type Tasks[A, R] = egobatch.Tasks[A, R, *errkratos.Erk]
 ```
 
-Methods:
-- `OkTasks()` - Get success tasks
-- `WaTasks()` - Get failed tasks
-- `Flatten(func)` - Transform results
+方法：
+- `OkTasks()` - 获取成功任务
+- `WaTasks()` - 获取失败任务
+- `Flatten(func)` - 转换结果
 
-## Examples
+## 示例
 
-See [examples](internal/examples/) for complete demos:
+查看 [examples](internal/examples/) 获取完整示例：
 
-- [example1](internal/examples/example1) - Guest order processing
-- [example2](internal/examples/example2) - Student score processing
-- [example3](internal/examples/example3) - Multi-step pipeline
+- [example1](internal/examples/example1) - 访客订单处理
+- [example2](internal/examples/example2) - 学生成绩处理
+- [example3](internal/examples/example3) - 多步骤流水线
 
-## Relationship with egobatch
+## 与 egobatch 的关系
 
-egokratos is built on top of [egobatch](https://github.com/yyle88/egobatch) using type aliases:
+egokratos 基于 [egobatch](https://github.com/yyle88/egobatch) 使用类型别名构建：
 
 ```go
-// egokratos provides Kratos-specific types
+// egokratos 提供 Kratos 专用类型
 type Task[A, R] = egobatch.Task[A, R, *errkratos.Erk]
 type Tasks[A, R] = egobatch.Tasks[A, R, *errkratos.Erk]
 type TaskBatch[A, R] = egobatch.TaskBatch[A, R, *errkratos.Erk]
 ```
 
-This approach:
-- ✅ Reduces code duplication
-- ✅ Maintains type-safe operations
-- ✅ Provides Kratos-optimized API
-- ✅ Benefits from egobatch improvements
+这种方式：
+- ✅ 减少代码重复
+- ✅ 保持类型安全
+- ✅ 提供 Kratos 友好的 API
+- ✅ 受益于 egobatch 的改进
 
-## License
+## 许可证
 
-MIT License. See [LICENSE](../LICENSE).
+MIT License. 参见 [LICENSE](../LICENSE).
 
-## Contributing
+## 贡献
 
-Issues and pull requests welcome!
+欢迎提交 Issue 和 Pull Request！
