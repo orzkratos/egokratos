@@ -4,7 +4,6 @@ go 1.25.0
 
 require (
 	github.com/go-kratos/kratos/v2 v2.9.1
-	github.com/orzkratos/errgenkratos v0.0.5
 	github.com/orzkratos/errkratos v0.0.30
 	github.com/stretchr/testify v1.11.1
 	github.com/yyle88/egobatch v0.0.1
@@ -27,8 +26,9 @@ require (
 	github.com/yyle88/syntaxgo v0.0.53 // indirect
 	github.com/yyle88/tern v0.0.9 // indirect
 	go.uber.org/multierr v1.11.0 // indirect
+	golang.org/x/net v0.44.0 // indirect
 	golang.org/x/sys v0.37.0 // indirect
-	google.golang.org/genproto/googleapis/rpc v0.0.0-20251020155222-88f65dc88635 // indirect
+	google.golang.org/genproto/googleapis/rpc v0.0.0-20251022142026-3a174f9686a8 // indirect
 	google.golang.org/grpc v1.76.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
